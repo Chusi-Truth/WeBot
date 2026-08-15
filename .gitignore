@@ -1,0 +1,12 @@
+node_modules/
+dist/
+coverage/
+.DS_Store
+.env
+.webot/
+*.log
+
+# User-created character cards and private runtime exports.
+characters/*.card.json
+*.webot-backup.*
+webot-state-backup*

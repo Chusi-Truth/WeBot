@@ -1,0 +1,20 @@
+{
+  "defaultProvider": "custom",
+  "providers": [
+    {
+      "id": "custom",
+      "label": "My OpenAI-compatible API",
+      "api": "chat-completions",
+      "baseUrl": "https://example.com/v1",
+      "model": "your-model-id",
+      "apiKeyEnv": "CUSTOM_API_KEY",
+      "apiKeyHeader": "Authorization",
+      "apiKeyPrefix": "Bearer ",
+      "timeoutMs": 90000,
+      "inputTokenBudget": 24000,
+      "maxOutputTokens": 2000,
+      "toolCalling": "native",
+      "userIdField": "none"
+    }
+  ]
+}

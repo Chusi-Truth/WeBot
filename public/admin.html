@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <title>WeBot Control</title>
+    <link rel="stylesheet" href="/admin.css">
+    <script src="/admin.js" defer></script>
+  </head>
+  <body>
+    <div class="shell">
+      <div class="page-header">
+        <header class="topbar">
+          <a class="brand" href="/admin" aria-label="WeBot Control 首页">
+            <span class="brand-mark">W</span>
+            <span>
+              <strong>WeBot Control</strong>
+              <small>LOCAL OPERATOR CONSOLE</small>
+            </span>
+          </a>
+          <div class="topbar-actions">
+            <div class="local-badge">
+              <span class="pulse"></span>
+              仅本机
+            </div>
+            <button class="logout-button" id="admin-logout" type="button">退出</button>
+          </div>
+        </header>
+
+        <section class="hero">
+          <div>
+            <p class="eyebrow">CONTROL PLANE / 0.7.0</p>
+            <h1>人物设定工作台</h1>
+            <p class="hero-copy">
+              把角色写得更完整，并让身份、表达与长期记忆保持一致。
+            </p>
+          </div>
+          <div class="metric-grid" id="metrics" aria-live="polite"></div>
+        </section>
+
+        <nav class="tabs" aria-label="管理区域" role="tablist">
+          <button class="tab active" id="tab-agents" data-tab="agents" role="tab" aria-selected="true" aria-controls="panel-agents">人物设定</button>
+          <button class="tab" id="tab-providers" data-tab="providers" role="tab" aria-selected="false" aria-controls="panel-providers">API Providers</button>
+          <button class="tab" id="tab-security" data-tab="security" role="tab" aria-selected="false" aria-controls="panel-security">Security</button>
+        </nav>
+      </div>
+
+      <main>
+        <section class="panel active" id="panel-agents" role="tabpanel" aria-labelledby="tab-agents">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">CHARACTER STUDIO</p>
+              <h2>编辑人物</h2>
+              <p>从人物卡片进入完整设定与 AI 助手；主页只保留运行状态、记忆和必要操作。</p>
+            </div>
+            <div class="heading-actions">
+              <button class="button ghost" id="import-card">导入角色卡</button>
+              <button class="button primary" id="new-agent">新建 Agent</button>
+              <input class="visually-hidden" id="card-file" type="file" accept="application/json,.json">
+            </div>
+          </div>
+
+          <div class="user-picker">
+            <label for="user-select">微信用户</label>
+            <select id="user-select" aria-label="选择微信用户"></select>
+          </div>
+
+          <div class="workspace">
+            <aside class="agent-list-wrap">
+              <div class="list-label">AGENT COLLECTION</div>
+              <div class="agent-list" id="agent-list" tabindex="0" aria-label="Agent 列表"></div>
+            </aside>
+            <section class="editor-card" id="agent-editor" tabindex="0" aria-label="人物编辑器">
+              <div class="empty-state">
+                <span class="empty-glyph">A</span>
+                <h3>选择一个 Agent</h3>
+                <p>从左侧选择 Agent 后即可编辑。</p>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="panel" id="panel-providers" role="tabpanel" aria-labelledby="tab-providers" hidden>
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">MODEL ROUTING</p>
+              <h2>API Providers</h2>
+              <p>密钥保存后立即生效；已有密钥不会回显到浏览器。</p>
+            </div>
+          </div>
+          <div class="provider-grid" id="provider-grid"></div>
+        </section>
+
+        <section class="panel" id="panel-security" role="tabpanel" aria-labelledby="tab-security" hidden>
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">LOCAL SECURITY</p>
+              <h2>安全边界</h2>
+              <p>这个后台为本机运维而设计，不是面向公网的管理系统。</p>
+            </div>
+          </div>
+          <div class="security-grid">
+            <article class="security-card">
+              <span class="number">01</span>
+              <h3>Loopback only</h3>
+              <p>服务只监听 127.0.0.1，局域网和公网设备无法直接连接。</p>
+            </article>
+            <article class="security-card">
+              <span class="number">02</span>
+              <h3>Keys stay opaque</h3>
+              <p>页面只显示密钥是否配置，从不读取或返回已有密钥明文。</p>
+            </article>
+            <article class="security-card">
+              <span class="number">03</span>
+              <h3>Memory isolation</h3>
+              <p>对话记忆按“微信用户 × Agent”分文件保存，切换不会串台。</p>
+            </article>
+            <article class="security-card">
+              <span class="number">04</span>
+              <h3>Protected writes</h3>
+              <p>写操作同时校验管理 Cookie、同源地址和自定义请求头。</p>
+            </article>
+          </div>
+          <div class="path-note">
+            <span>PRIVATE STATE</span>
+            <code>~/.webot/</code>
+            <p>凭证、API Key、管理令牌和 Agent 记忆均保存在私密状态目录。</p>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <span>WEBOT / ILINK ADAPTER</span>
+        <span id="footer-status">正在读取本地状态…</span>
+      </footer>
+    </div>
+
+    <dialog id="agent-dialog" aria-labelledby="agent-dialog-title">
+      <form method="dialog" id="create-agent-form">
+        <div class="dialog-head">
+          <div>
+            <p class="eyebrow">NEW IDENTITY</p>
+            <h2 id="agent-dialog-title">创建 Agent</h2>
+          </div>
+          <button
+            class="icon-button"
+            id="agent-dialog-close"
+            type="button"
+            aria-label="关闭"
+          >×</button>
+        </div>
+        <label>
+          Agent 名称
+          <input name="name" required maxlength="80" placeholder="例如：论文助手">
+        </label>
+        <label>
+          身份描述
+          <textarea name="identity" required maxlength="20000" rows="7" placeholder="描述它是谁、擅长什么，以及回答时应遵守的边界。"></textarea>
+        </label>
+        <label>
+          聊天表现
+          <select name="conversationMode">
+            <option value="wechat">微信聊天 · 只发送聊天文字</option>
+            <option value="roleplay">沉浸扮演 · 允许动作和场景描写</option>
+          </select>
+        </label>
+        <div class="form-row">
+          <label>
+            Provider
+            <select name="providerId" id="create-provider"></select>
+          </label>
+          <label>
+            模型覆盖（可选）
+            <input name="model" placeholder="使用 Provider 默认模型">
+          </label>
+        </div>
+        <div class="dialog-actions">
+          <button
+            class="button ghost"
+            id="agent-dialog-cancel"
+            type="button"
+          >取消</button>
+          <button
+            class="button primary"
+            id="create-agent-submit"
+            type="submit"
+          >创建并切换</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog
+      id="persona-dialog"
+      class="persona-dialog"
+      aria-labelledby="persona-dialog-title"
+      aria-describedby="persona-dialog-description"
+    >
+      <section class="persona-dialog-shell">
+        <div class="dialog-head persona-dialog-head">
+          <div>
+            <p class="eyebrow">PERSONA STUDIO</p>
+            <h2 id="persona-dialog-title">人物设定</h2>
+            <p id="persona-dialog-description">
+              完整设定区展示已保存版本；AI 助手会以当前已保存的人物设定为基础生成修改草稿。
+            </p>
+            <a class="persona-assistant-jump" href="#persona-assistant">直接使用 AI 助手 ↓</a>
+          </div>
+          <button class="icon-button" type="button" id="persona-close" aria-label="关闭人物设定">×</button>
+        </div>
+        <div class="persona-dialog-workspace">
+          <section class="persona-detail-pane" aria-labelledby="persona-detail-title">
+            <div class="persona-pane-head">
+              <div>
+                <span class="mini-label">PERSONA CARD / FULL PROFILE</span>
+                <h3 id="persona-detail-title">完整人物设定</h3>
+              </div>
+              <span class="persona-saved-badge">已保存版本</span>
+            </div>
+            <section class="roleplay-style-studio" aria-labelledby="roleplay-style-title">
+              <div class="roleplay-style-head">
+                <div>
+                  <span class="mini-label">ROLEPLAY PROSE DIRECTOR</span>
+                  <h4 id="roleplay-style-title">情景模式文风</h4>
+                </div>
+                <span class="roleplay-only-badge">仅情景模式生效</span>
+              </div>
+              <p class="roleplay-style-intro">
+                自定义环境、感官、动作、心理、视角、节奏和篇幅等写法。这里不会改变人物身份、关系或记忆，也不会影响微信聊天模式。
+              </p>
+              <label class="roleplay-style-field" for="roleplay-style-prompt">
+                当前文风 Prompt
+                <textarea
+                  id="roleplay-style-prompt"
+                  rows="9"
+                  maxlength="20000"
+                  placeholder="例如：采用第三人称限知视角；环境描写包含光线、声音与温度；通过可观察的动作和身体反应呈现心理变化；对白与叙述自然交替，不替用户决定行动。"
+                ></textarea>
+                <span class="field-help">
+                  <span>可直接编辑并保存</span>
+                  <span id="roleplay-style-count">0 / 20000</span>
+                </span>
+              </label>
+              <div class="roleplay-style-ai">
+                <div>
+                  <strong>让 AI 帮你写成详细规则</strong>
+                  <span>只会生成这个文风字段，不会修改人物其他设定。</span>
+                </div>
+                <div class="assistant-prompts roleplay-style-prompts" aria-label="文风要求示例">
+                  <button type="button" data-style-prompt="详细描写环境和感官信息，让场景有空间感和真实触感。">细写环境</button>
+                  <button type="button" data-style-prompt="详细呈现 Agent 的心理状态，但不要直接替用户描述心理或决定行动。">加强心理</button>
+                  <button type="button" data-style-prompt="让动作、心理和对白自然交替，节奏像真实发生的互动，不写成流水账。">平衡节奏</button>
+                </div>
+                <label for="roleplay-style-request">
+                  用一句话描述你想要的效果
+                  <textarea
+                    id="roleplay-style-request"
+                    rows="3"
+                    maxlength="4000"
+                    placeholder="例如：详细描述环境和 Agent 的心理状态，节奏慢一些，但不要替用户行动。"
+                  ></textarea>
+                </label>
+              </div>
+              <div class="roleplay-style-actions">
+                <button class="button ghost" type="button" id="roleplay-style-save">保存当前 Prompt</button>
+                <button class="button primary" type="button" id="roleplay-style-generate">AI 生成详细规则</button>
+              </div>
+              <p class="roleplay-style-status" id="roleplay-style-status" role="status" aria-live="polite">
+                尚未为这个人物单独设置情景文风。
+              </p>
+            </section>
+            <section class="writing-examples-launch" aria-labelledby="writing-examples-launch-title">
+              <div class="writing-examples-launch-mark" aria-hidden="true">Aa</div>
+              <div>
+                <span class="mini-label">STYLE REFERENCE LIBRARY</span>
+                <h4 id="writing-examples-launch-title">写作示例库</h4>
+                <p>保存你认可的叙事片段，让 Agent 学习句式、节奏和描写方式；示例剧情不会被当作真实经历。</p>
+              </div>
+              <div class="writing-examples-launch-action">
+                <span id="writing-examples-launch-count">0 条示例</span>
+                <button class="button ghost" type="button" id="open-writing-examples" aria-haspopup="dialog" aria-controls="writing-examples-dialog">管理示例</button>
+              </div>
+            </section>
+            <section class="saved-persona" id="current-persona-summary" aria-label="当前已保存的人物设定">
+              <div class="assistant-empty">选择人物后，这里会展示当前已保存的具体设定。</div>
+            </section>
+          </section>
+          <aside class="persona-assistant" id="persona-assistant" tabindex="-1" aria-labelledby="persona-assistant-title">
+            <div class="assistant-head">
+              <div>
+                <p class="eyebrow">AI CO-WRITER</p>
+                <h3 id="persona-assistant-title">人物设定助手</h3>
+              </div>
+              <span class="assistant-status" id="persona-assistant-status" role="status" aria-live="polite">待命</span>
+            </div>
+            <div class="assistant-scroll">
+              <p class="assistant-intro" id="persona-assistant-context">
+                选择人物后，可以让 AI 帮你深化设定、检查矛盾或调整说话方式。
+              </p>
+              <div class="assistant-prompts" aria-label="快捷修改要求">
+                <button type="button" data-persona-prompt="在不改变核心经历和既有关系的前提下，补充现实生活、缺点、目标与稳定行为逻辑。">丰富人物细节</button>
+                <button type="button" data-persona-prompt="让微信聊天更像真人：减少动作旁白、文艺比喻和心理咨询式表达，同时保留原有性格。">让聊天更自然</button>
+                <button type="button" data-persona-prompt="检查当前人物设定中的事实冲突、时间线问题、重复规则和过度标签，并给出一致的修订版本。">检查设定矛盾</button>
+              </div>
+              <label for="persona-request">
+                你希望怎样修改？
+                <textarea id="persona-request" rows="5" maxlength="4000" placeholder="例如：保留她谨慎慢热的性格，但增加普通日常、职业困境和稳定关系中的温暖。"></textarea>
+              </label>
+              <button class="button primary assistant-generate" type="button" id="persona-generate">
+                生成修改草稿
+              </button>
+              <div class="assistant-result" id="persona-result" aria-live="polite">
+                <div class="assistant-empty">
+                  AI 会先生成修改预览并复核是否忠实于原意。确认后可直接“应用并保存”，记忆和世界书不会被自动改写。
+                </div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </dialog>
+
+    <dialog
+      id="director-event-dialog"
+      class="director-event-dialog"
+      aria-labelledby="director-event-title"
+      aria-describedby="director-event-description"
+    >
+      <section class="director-event-shell">
+        <div class="dialog-head director-event-head">
+          <div>
+            <p class="eyebrow">ROLEPLAY DIRECTOR</p>
+            <h2 id="director-event-title">导演事件</h2>
+            <p id="director-event-description">
+              把事件前提设为已经确定的事实。人物可以保留自己的情绪和表达方式，但不会拒绝、回避或拖延进入事件。
+            </p>
+          </div>
+          <button class="icon-button" type="button" id="director-event-close" aria-label="关闭导演事件">×</button>
+        </div>
+        <div class="director-event-workspace">
+          <section class="director-event-editor" aria-labelledby="director-event-editor-title">
+            <div class="director-event-editor-head">
+              <div>
+                <span class="mini-label">CURRENT EVENT / EDITOR</span>
+                <h3 id="director-event-editor-title">编辑事件</h3>
+              </div>
+              <span class="roleplay-only-badge">仅情景模式生效</span>
+            </div>
+            <div class="director-event-principle">
+              <strong>这是导演已经确定的事件，不是给人物选择是否参加的提议。</strong>
+              <p>启用后，人物必须无条件接受事件前提并从中继续互动；可以按照性格表达惊讶、不满等情绪，但不能对是否参与表现犹豫，也不能拒绝、回避或拖延进入事件。这里不会替用户决定行动。</p>
+            </div>
+            <form id="director-event-form" class="director-event-form">
+              <label class="director-event-switch">
+                <input id="director-event-enabled" name="enabled" type="checkbox">
+                <span>
+                  <strong>启用导演事件</strong>
+                  <small>关闭只会停止注入，不会删除已经填写的内容。</small>
+                </span>
+              </label>
+              <label for="director-event-name">
+                事件标题
+                <input
+                  id="director-event-name"
+                  name="title"
+                  maxlength="200"
+                  placeholder="例如：已经约好的海边旅行"
+                >
+              </label>
+              <label for="director-event-premise">
+                事件前提 · 已经确定的事实
+                <textarea
+                  id="director-event-premise"
+                  name="premise"
+                  rows="8"
+                  maxlength="20000"
+                  placeholder="例如：角色已经答应和用户一起去海边。两人已经抵达车站，车票和行李都准备好了；角色不会重新拒绝这次同行。"
+                ></textarea>
+              </label>
+              <label for="director-event-world">
+                世界与场景设定
+                <textarea
+                  id="director-event-world"
+                  name="world"
+                  rows="11"
+                  maxlength="20000"
+                  placeholder="填写当前时间、地点、现场人物、世界规则、环境状态和事件中已经成立的信息。"
+                ></textarea>
+              </label>
+            </form>
+          </section>
+          <aside class="persona-assistant director-event-assistant" id="director-event-assistant" aria-labelledby="director-event-assistant-title">
+            <div class="assistant-head">
+              <div>
+                <p class="eyebrow">AI EVENT CO-WRITER</p>
+                <h3 id="director-event-assistant-title">事件助手</h3>
+              </div>
+              <span class="assistant-status" id="director-event-assistant-status" role="status" aria-live="polite">待命</span>
+            </div>
+            <div class="assistant-scroll">
+              <p class="assistant-intro" id="director-event-assistant-context">
+                用自然语言说明事件构想，AI 会忠实补全标题、前提和世界场景，不会改变你的事件方向。
+              </p>
+              <div class="assistant-prompts" aria-label="事件生成快捷要求">
+                <button type="button" data-director-event-prompt="忠实保留我的事件方向，补全时间、地点、现场人物和清晰的世界规则，让事件可以立即开始。">补全世界</button>
+                <button type="button" data-director-event-prompt="把我的构想写成已经确定且人物必须接受的事件前提，不要把它写成邀请、建议或等待人物同意的提议。">写实事件前提</button>
+                <button type="button" data-director-event-prompt="保留现有事实，增加有互动空间的现场细节和可继续发展的线索，但不要替用户决定行动。">丰富可聊细节</button>
+              </div>
+              <label for="director-event-request">
+                你希望怎样创建或修改？
+                <textarea
+                  id="director-event-request"
+                  rows="6"
+                  maxlength="4000"
+                  placeholder="例如：让角色和我已经来到一座临海小城度假。角色无条件接受这次旅行；请补全真实的车站、住处和当晚天气，但不要替我行动。"
+                ></textarea>
+              </label>
+              <button class="button primary assistant-generate" type="button" id="director-event-generate">
+                生成事件草稿
+              </button>
+              <div class="assistant-result" id="director-event-result" aria-live="polite">
+                <div class="assistant-empty">
+                  AI 只会生成预览。先应用到左侧编辑器，确认无误后再保存，当前事件不会被自动覆盖。
+                </div>
+              </div>
+            </div>
+          </aside>
+        </div>
+        <div class="director-event-footer">
+          <p id="director-event-status" role="status" aria-live="polite">尚未设置导演事件。</p>
+          <div>
+            <button class="button ghost" type="button" id="director-event-cancel">取消</button>
+            <button class="button primary" type="button" id="director-event-save">保存事件</button>
+          </div>
+        </div>
+      </section>
+    </dialog>
+
+    <dialog
+      id="story-book-dialog"
+      class="story-book-dialog"
+      aria-labelledby="story-book-title"
+      aria-describedby="story-book-description"
+    >
+      <section class="story-book-shell">
+        <div class="dialog-head story-book-head">
+          <div>
+            <p class="eyebrow">STORY BOOK / FULL PROSE</p>
+            <h2 id="story-book-title">故事书</h2>
+            <p id="story-book-description">
+              把剧情构想写成可直接阅读的完整故事。故事书是独立写作空间，不会作为导演事件注入聊天。
+            </p>
+          </div>
+          <button class="icon-button" type="button" id="story-book-close" aria-label="关闭故事书">×</button>
+        </div>
+        <div class="story-book-workspace">
+          <aside class="story-book-library" aria-labelledby="story-book-library-title">
+            <div class="story-book-library-head">
+              <div>
+                <span class="mini-label">PRIVATE LIBRARY</span>
+                <h3 id="story-book-library-title">作品库</h3>
+              </div>
+              <button class="button ghost compact" type="button" id="story-book-new">新建</button>
+            </div>
+            <div class="story-book-list" id="story-book-list" aria-live="polite">
+              <div class="assistant-empty">正在读取作品…</div>
+            </div>
+          </aside>
+          <section class="story-book-editor" aria-labelledby="story-book-editor-title">
+            <div class="story-book-editor-head">
+              <div>
+                <span class="mini-label">COMPLETE STORY / EDITOR</span>
+                <h3 id="story-book-editor-title">完整正文</h3>
+              </div>
+              <span id="story-book-count">0 字</span>
+            </div>
+            <form id="story-book-form" class="story-book-form">
+              <label for="story-book-name">
+                作品标题
+                <input id="story-book-name" maxlength="200" placeholder="例如：雨夜最后一班车">
+              </label>
+              <label for="story-book-premise">
+                你的剧情构想
+                <textarea id="story-book-premise" rows="5" maxlength="20000" placeholder="写下人物、关系、事件走向、希望出现的情节与结局。这里保存的是你的原始剧情方向。"></textarea>
+              </label>
+              <label class="story-book-content-label" for="story-book-content">
+                完整故事正文
+                <textarea id="story-book-content" rows="24" maxlength="100000" placeholder="AI 生成的将是连续、可直接阅读的完整故事正文，而不是剧情大纲。你也可以直接在这里写作。"></textarea>
+              </label>
+            </form>
+          </section>
+          <aside class="persona-assistant story-book-assistant" id="story-book-assistant" aria-labelledby="story-book-assistant-title">
+            <div class="assistant-head">
+              <div>
+                <p class="eyebrow">AI STORY CO-WRITER</p>
+                <h3 id="story-book-assistant-title">故事助手</h3>
+              </div>
+              <span class="assistant-status" id="story-book-assistant-status" role="status" aria-live="polite">待命</span>
+            </div>
+            <div class="assistant-scroll">
+              <p class="assistant-intro" id="story-book-assistant-context">
+                写下剧情方向，AI 会结合当前人物设定、长期记忆和最近聊天扩写成完整正文；未指定篇幅时默认约 3000–5000 字。如果已有正文，也可以要求续写或局部改写。
+              </p>
+              <p class="assistant-note">DeepSeek 会先用思考模式规划剧情，再关闭显式推理逐段写正文，最后检查连续性。通常需要依次完成 6 个左右的请求，生成期间请保持页面打开。</p>
+              <div class="assistant-prompts" aria-label="故事生成快捷要求">
+                <button type="button" data-story-book-prompt="忠实保留我的剧情构想，把它写成一篇约 3000–5000 字、有清楚开端、发展和收束的完整故事正文，不要输出大纲或创作说明。">写成完整故事</button>
+                <button type="button" data-story-book-prompt="保留现有正文和已经发生的事实，从结尾自然续写新的完整章节，不要重写已有段落。">续写下一章</button>
+                <button type="button" data-story-book-prompt="保留剧情方向，丰富场景环境、人物动作、自然对白和心理变化，让正文更具体连贯。">丰富正文细节</button>
+              </div>
+              <label for="story-book-request">
+                你希望怎样写或修改？
+                <textarea id="story-book-request" rows="7" maxlength="8000" placeholder="例如：按照左侧构想写成约 3000 字的现实题材短篇，第三人称，结尾完整收束。"></textarea>
+              </label>
+              <button class="button primary assistant-generate" type="button" id="story-book-generate">生成完整故事草稿</button>
+              <div class="assistant-result" id="story-book-result" aria-live="polite">
+                <div class="assistant-empty">AI 只生成预览，不会自动覆盖或保存正文。</div>
+              </div>
+            </div>
+          </aside>
+        </div>
+        <div class="story-book-footer">
+          <button class="button danger" type="button" id="story-book-delete">删除这篇</button>
+          <p id="story-book-status" role="status" aria-live="polite">故事书尚未打开。</p>
+          <div>
+            <button class="button ghost" type="button" id="story-book-cancel">关闭</button>
+            <button class="button primary" type="button" id="story-book-save">保存作品</button>
+          </div>
+        </div>
+      </section>
+    </dialog>
+
+    <dialog
+      id="writing-examples-dialog"
+      class="writing-examples-dialog"
+      aria-labelledby="writing-examples-title"
+      aria-describedby="writing-examples-description"
+    >
+      <section class="writing-examples-shell">
+        <div class="dialog-head writing-examples-head">
+          <div>
+            <p class="eyebrow">STYLE REFERENCE LIBRARY</p>
+            <h2 id="writing-examples-title">写作示例库</h2>
+            <p id="writing-examples-description">每条示例都是文风参考，不会成为人物事实、剧情或记忆。列表越靠前，优先级越高；AI 改写会先生成预览，不会自动保存。</p>
+          </div>
+          <button class="icon-button" type="button" id="writing-examples-close" aria-label="关闭写作示例库">×</button>
+        </div>
+        <div class="writing-examples-body">
+          <div class="writing-examples-toolbar">
+            <div>
+              <strong id="writing-examples-agent">尚未选择人物</strong>
+              <span id="writing-examples-count">0 / 20 条</span>
+            </div>
+            <button class="button ghost" type="button" id="writing-example-add">＋ 添加示例</button>
+          </div>
+          <div class="writing-examples-workspace">
+            <ol class="writing-examples-list" id="writing-examples-list" aria-label="写作示例列表"></ol>
+            <section class="writing-example-editor" id="writing-example-editor"></section>
+          </div>
+        </div>
+        <div class="writing-examples-footer">
+          <p id="writing-examples-status" role="status" aria-live="polite">尚未添加写作示例。</p>
+          <div>
+            <button class="button ghost" type="button" id="writing-examples-cancel">取消</button>
+            <button class="button primary" type="button" id="writing-examples-save">保存示例库</button>
+          </div>
+        </div>
+      </section>
+    </dialog>
+
+    <dialog id="history-dialog" class="history-dialog">
+      <section class="history-dialog-shell">
+        <div class="dialog-head">
+          <div>
+            <p class="eyebrow">COMPLETE CHAT MEMORY</p>
+            <h2 id="history-title">完整聊天记忆</h2>
+            <p id="history-status">正在读取全部聊天记录…</p>
+          </div>
+          <button class="icon-button" type="button" id="history-close" aria-label="关闭">×</button>
+        </div>
+        <div class="history-tools">
+          <label for="history-search">搜索聊天内容</label>
+          <div>
+            <input id="history-search" type="search" placeholder="输入关键词，例如：地图、约定、喜欢">
+            <button class="button ghost" type="button" id="history-export">导出全部</button>
+          </div>
+        </div>
+        <div class="history-list" id="history-list" aria-live="polite"></div>
+      </section>
+    </dialog>
+
+    <dialog id="summary-history-dialog" class="history-dialog summary-history-dialog">
+      <section class="history-dialog-shell">
+        <div class="dialog-head">
+          <div>
+            <p class="eyebrow">CURATED MEMORY ARCHIVE</p>
+            <h2 id="summary-history-title">总结记忆历史</h2>
+            <p id="summary-history-status">正在读取全部摘要版本…</p>
+          </div>
+          <button class="icon-button" type="button" id="summary-history-close" aria-label="关闭">×</button>
+        </div>
+        <div class="history-tools">
+          <label for="summary-history-search">搜索总结、事实或关键经历</label>
+          <div>
+            <input id="summary-history-search" type="search" placeholder="输入关键词，例如：约定、偏好、关系变化">
+          </div>
+        </div>
+        <div class="history-list summary-history-list" id="summary-history-list" aria-live="polite"></div>
+      </section>
+    </dialog>
+
+    <dialog id="episode-archive-dialog" class="history-dialog episode-archive-dialog">
+      <section class="history-dialog-shell">
+        <div class="dialog-head">
+          <div>
+            <p class="eyebrow">COMPLETE EVENT MEMORY</p>
+            <h2 id="episode-archive-title">全部事件记忆</h2>
+            <p id="episode-archive-status">正在读取事件记忆档案…</p>
+          </div>
+          <button class="icon-button" type="button" id="episode-archive-close" aria-label="关闭">×</button>
+        </div>
+        <div class="episode-archive-notice" id="episode-archive-notice" hidden></div>
+        <div class="history-tools">
+          <label for="episode-archive-search">搜索事件标题或内容</label>
+          <div>
+            <input id="episode-archive-search" type="search" placeholder="输入关键词，例如：约定、争执、毕业">
+            <button class="button" type="button" id="episode-archive-organize">整理为大事件</button>
+            <button class="button ghost" type="button" id="episode-archive-rebuild">从完整聊天重建</button>
+          </div>
+          <p class="episode-organize-explainer">“整理为大事件”只会整理这里已经保存的事件细节，不会重新读取完整聊天；原有细节会全部保留。</p>
+        </div>
+        <div class="episode-organization-status" id="episode-organization-status" hidden></div>
+        <div class="episode-rebuild-progress" id="episode-rebuild-progress" hidden>
+          <div><span id="episode-rebuild-progress-label">正在准备…</span><b id="episode-rebuild-progress-count">0 / 0</b></div>
+          <progress id="episode-rebuild-progress-bar" max="1" value="0"></progress>
+        </div>
+        <div class="history-list episode-archive-list" id="episode-archive-list" aria-live="polite"></div>
+      </section>
+    </dialog>
+
+    <dialog id="trace-dialog" class="history-dialog trace-dialog">
+      <section class="history-dialog-shell trace-dialog-shell">
+        <div class="dialog-head">
+          <div>
+            <p class="eyebrow">PROMPT TRACE / PRIVATE</p>
+            <h2 id="trace-title">模型看到的内容</h2>
+            <p id="trace-status">正在读取最近调用…</p>
+          </div>
+          <button class="icon-button" type="button" id="trace-close" aria-label="关闭">×</button>
+        </div>
+        <div class="trace-workspace">
+          <aside class="trace-list" id="trace-list" aria-label="最近模型调用"></aside>
+          <section class="trace-detail" id="trace-detail" aria-live="polite">
+            <div class="memory-empty">选择一条记录，查看最终 Prompt。</div>
+          </section>
+        </div>
+      </section>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

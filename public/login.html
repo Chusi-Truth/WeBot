@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <title>登录 · WeBot Control</title>
+    <link rel="stylesheet" href="/login.css">
+    <script src="/login.js" defer></script>
+  </head>
+  <body>
+    <main class="login-shell">
+      <section class="login-card" aria-labelledby="login-title">
+        <div class="brand-mark">W</div>
+        <p class="eyebrow">WEBOT CONTROL / PRIVATE ACCESS</p>
+        <h1 id="login-title">管理后台登录</h1>
+        <p class="intro" id="login-intro">输入管理密码以继续。</p>
+
+        <form id="login-form" hidden>
+          <label for="login-password">管理密码</label>
+          <input id="login-password" name="password" type="password" autocomplete="current-password" minlength="10" maxlength="200" required autofocus>
+          <button type="submit">登录</button>
+        </form>
+
+        <form id="setup-form" hidden>
+          <label for="setup-password">设置管理密码</label>
+          <input id="setup-password" name="password" type="password" autocomplete="new-password" minlength="10" maxlength="200" required>
+          <label for="setup-confirmation">再次输入</label>
+          <input id="setup-confirmation" name="confirmation" type="password" autocomplete="new-password" minlength="10" maxlength="200" required>
+          <p class="hint">至少 10 个字符。服务器只保存加盐哈希，不保存密码明文。</p>
+          <button type="submit">保存并进入后台</button>
+        </form>
+
+        <p class="message" id="login-message" role="status" aria-live="polite"></p>
+        <div class="boundary"><span></span>仅可通过服务器本机或 SSH 隧道访问</div>
+      </section>
+    </main>
+  </body>
+</html>

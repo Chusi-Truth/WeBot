@@ -1,0 +1,25 @@
+[Unit]
+Description=WeBot Weixin iLink Agent
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=webot
+Group=webot
+WorkingDirectory=/opt/webot
+Environment=NODE_ENV=production
+Environment=WEBOT_STATE_DIR=/var/lib/webot
+ExecStart=/usr/local/bin/node /opt/webot/dist/cli.js start
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/webot
+
+[Install]
+WantedBy=multi-user.target

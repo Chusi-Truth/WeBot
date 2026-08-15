@@ -1,0 +1,42 @@
+{
+  "name": "webot-ilink-adapter",
+  "version": "0.7.0",
+  "description": "Standalone Weixin iLink adapter without OpenClaw",
+  "type": "module",
+  "license": "MIT",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
+    "build": "npm run clean && tsc -p tsconfig.build.json",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "dev": "tsx src/cli.ts",
+    "login": "tsx src/cli.ts login",
+    "start": "tsx src/cli.ts start",
+    "admin": "tsx src/cli.ts admin",
+    "status": "tsx src/cli.ts status",
+    "logout": "tsx src/cli.ts logout",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "qrcode-terminal": "0.12.0",
+    "silk-wasm": "^3.7.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/qrcode-terminal": "^0.12.2",
+    "tsx": "^4.20.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.2.0"
+  }
+}
