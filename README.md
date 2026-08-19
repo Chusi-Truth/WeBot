@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/assets/webot-hero.svg" alt="WeBot — lightweight WeChat iLink Agent framework" width="100%">
+</p>
+
 # WeBot
 
 > 部署说明：[本地部署与 Linux 服务器部署](docs/DEPLOYMENT.md)
