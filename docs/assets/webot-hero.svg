@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="720" viewBox="0 0 1600 720" role="img" aria-labelledby="title desc">
+  <title id="title">WeBot — lightweight WeChat iLink Agent framework</title>
+  <desc id="desc">WeBot connects WeChat iLink to pluggable AI providers with multi-agent identities, independent memory, tool calling, and multimodal support.</desc>
+  <defs>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#176b62" stroke-opacity=".07" stroke-width="1"/>
+    </pattern>
+    <linearGradient id="photo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#afd4ca"/>
+      <stop offset=".5" stop-color="#edf0d1"/>
+      <stop offset="1" stop-color="#e9a077"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="24" stdDeviation="22" flood-color="#102b29" flood-opacity=".16"/>
+    </filter>
+    <clipPath id="phoneClip"><rect x="1220" y="103" width="268" height="518" rx="34"/></clipPath>
+  </defs>
+
+  <rect width="1600" height="720" fill="#f4f2ea"/>
+  <rect width="1600" height="720" fill="url(#grid)"/>
+  <circle cx="1515" cy="-80" r="330" fill="none" stroke="#176b62" stroke-opacity=".08" stroke-width="82"/>
+  <circle cx="-70" cy="730" r="190" fill="#e66c3c" fill-opacity=".09"/>
+
+  <!-- brand -->
+  <rect x="74" y="67" width="72" height="72" rx="21" fill="#f9ded1"/>
+  <rect x="68" y="61" width="72" height="72" rx="21" fill="#176b62"/>
+  <text x="104" y="114" text-anchor="middle" fill="#fffdf7" font-family="Georgia, serif" font-size="49" font-weight="700">W</text>
+  <text x="161" y="91" fill="#17211f" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="30" font-weight="800">WeBot</text>
+  <text x="161" y="119" fill="#65716d" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="13" font-weight="700" letter-spacing="3.2">WECHAT ILINK ADAPTER</text>
+  <rect x="884" y="70" width="270" height="48" rx="24" fill="#fffdf7" fill-opacity=".76" stroke="#d8d8cf"/>
+  <text x="1019" y="100" text-anchor="middle" fill="#0d4d47" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" font-weight="800" letter-spacing="2">OPEN SOURCE · TYPESCRIPT</text>
+
+  <!-- hero copy -->
+  <text x="72" y="213" fill="#176b62" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="16" font-weight="800" letter-spacing="4">A LIGHTER WAY TO BUILD</text>
+  <text x="67" y="349" fill="#17211f" font-family="Georgia, 'Songti SC', 'STSong', serif" font-size="132" font-weight="700" letter-spacing="-5">WeBot</text>
+  <rect x="70" y="372" width="596" height="10" rx="5" fill="#e66c3c"/>
+  <text x="71" y="430" fill="#17211f" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="31" font-weight="750">轻量、独立、可扩展的微信 iLink Agent 框架</text>
+  <text x="72" y="477" fill="#65716d" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="19">不安装完整 OpenClaw，也能把长期记忆、角色扮演与多模态带进微信。</text>
+
+  <!-- capability pills -->
+  <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" font-weight="750">
+    <rect x="70" y="520" width="129" height="43" rx="21.5" fill="#dcebe7"/><text x="134.5" y="547" text-anchor="middle" fill="#0d4d47">MULTI-AGENT</text>
+    <rect x="211" y="520" width="123" height="43" rx="21.5" fill="#dcebe7"/><text x="272.5" y="547" text-anchor="middle" fill="#0d4d47">MEMORY</text>
+    <rect x="346" y="520" width="130" height="43" rx="21.5" fill="#f9ded1"/><text x="411" y="547" text-anchor="middle" fill="#8f3f25">TOOL CALL</text>
+    <rect x="488" y="520" width="154" height="43" rx="21.5" fill="#dcebe7"/><text x="565" y="547" text-anchor="middle" fill="#0d4d47">MULTIMODAL</text>
+  </g>
+
+  <!-- agent core card -->
+  <g filter="url(#shadow)">
+    <rect x="760" y="194" width="430" height="355" rx="31" fill="#fffdf7" stroke="#cfd4cc"/>
+  </g>
+  <rect x="790" y="224" width="128" height="31" rx="15.5" fill="#dcebe7"/>
+  <text x="854" y="244" text-anchor="middle" fill="#0d4d47" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12" font-weight="800" letter-spacing="1.4">AGENT CORE</text>
+  <circle cx="1139" cy="240" r="7" fill="#38a169"/><text x="1122" y="244" text-anchor="end" fill="#65716d" font-family="sans-serif" font-size="11" font-weight="700">READY</text>
+  <text x="790" y="307" fill="#17211f" font-family="Georgia, 'Songti SC', serif" font-size="31" font-weight="700">Identity · Memory · Tools</text>
+  <text x="790" y="344" fill="#65716d" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif" font-size="15">每个 Agent 独立保存身份、记忆、模型与表达方式</text>
+  <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+    <rect x="790" y="380" width="174" height="74" rx="17" fill="#eef5f2" stroke="#c7dcd6"/>
+    <text x="810" y="405" fill="#176b62" font-size="11" font-weight="800" letter-spacing="1.4">PROVIDER</text>
+    <text x="810" y="434" fill="#17211f" font-size="17" font-weight="750">Pluggable LLM</text>
+    <rect x="978" y="380" width="180" height="74" rx="17" fill="#faf3ec" stroke="#edd4c6"/>
+    <text x="998" y="405" fill="#b24f2d" font-size="11" font-weight="800" letter-spacing="1.4">PROMPT PLAN</text>
+    <text x="998" y="434" fill="#17211f" font-size="17" font-weight="750">Trust &amp; Budget</text>
+  </g>
+  <rect x="790" y="472" width="368" height="49" rx="15" fill="#102b29"/>
+  <text x="814" y="502" fill="#c7dfd9" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14">iLink → WeBot → AI providers</text>
+
+  <!-- phone -->
+  <g filter="url(#shadow)">
+    <rect x="1210" y="93" width="288" height="538" rx="45" fill="#102b29"/>
+    <rect x="1220" y="103" width="268" height="518" rx="34" fill="#f4f4ee"/>
+  </g>
+  <g clip-path="url(#phoneClip)">
+    <rect x="1290" y="103" width="128" height="24" rx="0 0 15 15" fill="#102b29"/>
+    <text x="1354" y="161" text-anchor="middle" fill="#17211f" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif" font-size="16" font-weight="750">旅行助手</text>
+    <line x1="1220" y1="180" x2="1488" y2="180" stroke="#d8d8cf"/>
+    <rect x="1285" y="204" width="175" height="64" rx="15" fill="#98e878"/>
+    <text x="1301" y="229" fill="#17211f" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif" font-size="13">给我看看周末旅行的</text>
+    <text x="1301" y="250" fill="#17211f" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif" font-size="13">感觉吧</text>
+    <rect x="1243" y="288" width="205" height="65" rx="15" fill="#fff"/>
+    <text x="1259" y="315" fill="#17211f" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif" font-size="13">可以。先给你一张氛围图，</text>
+    <text x="1259" y="336" fill="#17211f" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif" font-size="13">路线等会儿慢慢挑。</text>
+    <rect x="1243" y="371" width="205" height="151" rx="16" fill="url(#photo)"/>
+    <circle cx="1400" cy="412" r="43" fill="#fff1d8" fill-opacity=".65"/>
+    <path d="M1243 482L1300 429L1346 470L1380 439L1448 502V522H1243Z" fill="#176b62" fill-opacity=".25"/>
+    <rect x="1255" y="488" width="80" height="23" rx="7" fill="#102b29" fill-opacity=".68"/>
+    <text x="1295" y="504" text-anchor="middle" fill="#fff" font-family="sans-serif" font-size="9" font-weight="700">AI 生成图片</text>
+    <text x="1244" y="551" fill="#89938f" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif" font-size="11">对方正在输入…</text>
+  </g>
+
+  <!-- footer -->
+  <line x1="70" y1="629" x2="1180" y2="629" stroke="#176b62" stroke-opacity=".24"/>
+  <text x="71" y="670" fill="#65716d" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12" font-weight="750" letter-spacing="2.3">GITHUB.COM/CHUSI-TRUTH/WEBOT</text>
+  <text x="1180" y="670" text-anchor="end" fill="#176b62" font-family="Georgia, serif" font-size="17" font-weight="700">BUILD YOUR OWN WECHAT AGENT</text>
+</svg>
